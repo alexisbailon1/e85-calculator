@@ -24,6 +24,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.foundation.Image
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import com.example.e85calculator.R
 import androidx.compose.ui.text.SpanStyle
@@ -165,7 +166,7 @@ fun CalculatorScreen(modifier: Modifier) {
 
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) },
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -175,7 +176,7 @@ fun CalculatorScreen(modifier: Modifier) {
             Image(
                 painter = painterResource(id = R.drawable.e85logo),
                 contentDescription = "E85 Logo",
-                modifier = Modifier.height(100.dp)
+                modifier = Modifier.height(72.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -183,7 +184,7 @@ fun CalculatorScreen(modifier: Modifier) {
                     withStyle(SpanStyle(color = MaterialTheme.colorScheme.onBackground)) { append("Blend ") }
                     withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) { append("Calculator") }
                 },
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -275,6 +276,7 @@ fun CalculatorScreen(modifier: Modifier) {
             shape = RoundedCornerShape(28.dp),
             modifier = Modifier
                 .fillMaxWidth()
+                .wrapContentHeight()
                 .padding(bottom = 32.dp)
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
