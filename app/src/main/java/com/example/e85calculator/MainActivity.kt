@@ -23,9 +23,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.example.e85calculator.R
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
@@ -142,6 +148,8 @@ fun CalculatorScreen(modifier: Modifier) {
         }
     }
 
+    val e85Blue = Color(0xFF0057B8)
+
     val filledFieldColors = TextFieldDefaults.colors(
         focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -154,6 +162,7 @@ fun CalculatorScreen(modifier: Modifier) {
         disabledIndicatorColor = Color.Transparent,
     )
 
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -163,17 +172,19 @@ fun CalculatorScreen(modifier: Modifier) {
     ) {
         // ── Header ────────────────────────────────────────────────────────────
         Column(modifier = Modifier.padding(top = 24.dp, bottom = 4.dp)) {
-            Text(
-                text = "E85 Blend",
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
+            Image(
+                painter = painterResource(id = R.drawable.e85logo),
+                contentDescription = "E85 Logo",
+                modifier = Modifier.height(100.dp)
             )
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Calculator",
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                text = buildAnnotatedString {
+                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.onBackground)) { append("Blend ") }
+                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) { append("Calculator") }
+                },
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
             )
         }
 
@@ -245,7 +256,10 @@ fun CalculatorScreen(modifier: Modifier) {
                         currentFuelLevelPercentage = it
                         focusManager.clearFocus()
                     },
-                    valueRange = 0f..100f
+                    valueRange = 0f..100f,
+                    colors = SliderDefaults.colors(
+                        activeTrackColor = Color(0xFFF5C842)
+                    )
                 )
                 val gallonsInTank = (tankCapacity.toDoubleOrNull() ?: 0.0) * (currentFuelLevelPercentage / 100.0)
                 Text(
@@ -257,9 +271,8 @@ fun CalculatorScreen(modifier: Modifier) {
         }
 
         // ── Result Card ───────────────────────────────────────────────────────
-        Card(
+        ElevatedCard(
             shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 32.dp)
@@ -270,7 +283,7 @@ fun CalculatorScreen(modifier: Modifier) {
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.5.sp,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -289,23 +302,27 @@ fun CalculatorScreen(modifier: Modifier) {
                                 text = validationError ?: "",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         } else {
                             Text(
-                                text = "${"%.2f".format(blendResult.gallonsE85Needed)} gal E85",
+                                text = buildAnnotatedString {
+                                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
+                                        append("${"%.2f".format(blendResult.gallonsE85Needed)} gal ")
+                                    }
+                                    withStyle(SpanStyle(color = e85Blue)) { append("E85") }
+                                },
                                 style = MaterialTheme.typography.headlineLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = "+ ${"%.2f".format(blendResult.gallonsPumpGasNeeded)} gal pump gas",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            HorizontalDivider(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f))
+                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
                             Spacer(modifier = Modifier.height(12.dp))
 
                             val resultingEthanolPercentage = run {
@@ -324,7 +341,7 @@ fun CalculatorScreen(modifier: Modifier) {
                                 text = "Resulting mixture: ${"%.2f".format(resultingEthanolPercentage)}% ethanol",
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
