@@ -7,30 +7,28 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import com.example.e85calculator.ui.theme.E85CalculatorTheme
-import androidx.core.content.edit
 
 class MainActivity : ComponentActivity() {
     override fun onResume() {
@@ -52,18 +50,12 @@ class MainActivity : ComponentActivity() {
                 SideEffect {
                     activity?.window?.let { window ->
                         val controller = WindowCompat.getInsetsController(window, window.decorView)
-                        controller.isAppearanceLightStatusBars = false
+                        controller.isAppearanceLightStatusBars = true
                     }
                 }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color(0xFF2C2C2C), Color.Black)
-                            )
-                        )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     Scaffold(containerColor = Color.Transparent) { innerPadding ->
                         CalculatorScreen(modifier = Modifier.padding(innerPadding))
@@ -79,27 +71,13 @@ fun CalculatorScreen(modifier: Modifier) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("calculator_prefs", Context.MODE_PRIVATE)
 
-    // Load saved values or use defaults
-    var tankCapacity by remember {
-        mutableStateOf(prefs.getString("tankCapacity", "15.9") ?: "15.9")
-    }
-    var currentEthanolPercentage by remember {
-        mutableStateOf(prefs.getString("currentEthanolPercentage", "") ?: "")
-    }
-    var targetEthanolPercentage by remember {
-        mutableStateOf(prefs.getString("targetEthanolPercentage", "") ?: "")
-    }
-    var pumpE85Percentage by remember {
-        mutableStateOf(prefs.getString("pumpE85Percentage", "") ?: "")
-    }
-    var pumpGasPercentage by remember {
-        mutableStateOf(prefs.getString("pumpGasPercentage", "") ?: "")
-    }
-    var currentFuelLevelPercentage by remember {
-        mutableFloatStateOf(prefs.getFloat("currentFuelLevelPercentage", 0f))
-    }
+    var tankCapacity by remember { mutableStateOf(prefs.getString("tankCapacity", "15.9") ?: "15.9") }
+    var currentEthanolPercentage by remember { mutableStateOf(prefs.getString("currentEthanolPercentage", "") ?: "") }
+    var targetEthanolPercentage by remember { mutableStateOf(prefs.getString("targetEthanolPercentage", "") ?: "") }
+    var pumpE85Percentage by remember { mutableStateOf(prefs.getString("pumpE85Percentage", "") ?: "") }
+    var pumpGasPercentage by remember { mutableStateOf(prefs.getString("pumpGasPercentage", "") ?: "") }
+    var currentFuelLevelPercentage by remember { mutableFloatStateOf(prefs.getFloat("currentFuelLevelPercentage", 0f)) }
 
-    // Save values when they change
     DisposableEffect(tankCapacity, currentEthanolPercentage, targetEthanolPercentage,
         pumpE85Percentage, pumpGasPercentage, currentFuelLevelPercentage) {
         prefs.edit {
@@ -110,7 +88,6 @@ fun CalculatorScreen(modifier: Modifier) {
             putString("pumpGasPercentage", pumpGasPercentage)
             putFloat("currentFuelLevelPercentage", currentFuelLevelPercentage)
         }
-
         onDispose {}
     }
 
@@ -125,149 +102,226 @@ fun CalculatorScreen(modifier: Modifier) {
     }
 
     val validationError: String? = remember(tankCapacity, currentEthanolPercentage, targetEthanolPercentage, pumpE85Percentage, pumpGasPercentage, currentFuelLevelPercentage) {
-        val capacity = tankCapacity.toDoubleOrNull()
-        val eCurrent = currentEthanolPercentage.toDoubleOrNull()
-        val eTarget = targetEthanolPercentage.toDoubleOrNull()
-        val eE85 = pumpE85Percentage.toDoubleOrNull()
-        val eGas = pumpGasPercentage.toDoubleOrNull()
+        val capacity = tankCapacity.toDoubleOrNull() ?: 0.0
+        val eCurrent = currentEthanolPercentage.toDoubleOrNull() ?: 0.0
+        val eTarget = targetEthanolPercentage.toDoubleOrNull() ?: 0.0
+        val eE85 = pumpE85Percentage.toDoubleOrNull() ?: 0.0
+        val eGas = pumpGasPercentage.toDoubleOrNull() ?: 0.0
+        val hasCapacity = tankCapacity.isNotEmpty()
+        val hasCurrent = currentEthanolPercentage.isNotEmpty()
+        val hasTarget = targetEthanolPercentage.isNotEmpty()
+        val hasE85 = pumpE85Percentage.isNotEmpty()
+        val hasGas = pumpGasPercentage.isNotEmpty()
         when {
-            capacity != null && capacity <= 0 -> "Tank capacity must be greater than 0"
-            currentFuelLevelPercentage >= 100f -> "Tank is full — nothing to add"
-            eE85 != null && eGas != null && eE85 <= eGas -> "Pump E85 % must be higher than pump gas %"
-            eTarget != null && eE85 != null && eTarget > eE85 -> "Target % (${eTarget.toInt()}%) exceeds pump E85 % (${eE85.toInt()}%) — not achievable"
-            eTarget != null && eGas != null && eTarget < eGas -> "Target % (${eTarget.toInt()}%) is below pump gas % (${eGas.toInt()}%) — need to drain tank first"
-            eCurrent != null && eTarget != null && eE85 != null && eGas != null &&
-                eCurrent > eTarget && eCurrent > eGas -> "Current ethanol (${eCurrent.toInt()}%) already exceeds target — need to add pump gas only or drain tank"
+            hasCapacity && capacity <= 0 -> "Tank capacity must be greater than 0"
+            currentFuelLevelPercentage >= 100f -> "Tank is full - nothing to add"
+            hasE85 && hasGas && eE85 <= eGas -> "Pump E85 % must be higher than pump gas %"
+            hasTarget && hasE85 && eTarget > eE85 -> "Target % (${eTarget.toInt()}%) exceeds pump E85 % (${eE85.toInt()}%) - not achievable"
+            hasTarget && hasGas && eTarget < eGas -> "Target % (${eTarget.toInt()}%) is below pump gas % (${eGas.toInt()}%) - need to drain tank first"
+            hasCurrent && hasTarget && hasE85 && hasGas && eCurrent > eTarget && eCurrent > eGas ->
+                "Current ethanol (${eCurrent.toInt()}%) already exceeds target - add pump gas only or drain tank"
+            hasCapacity && hasTarget && hasE85 && hasGas && capacity > 0 && currentFuelLevelPercentage < 100f -> {
+                val currentFuelVolume = capacity * (currentFuelLevelPercentage / 100.0)
+                val totalFillVolume = capacity - currentFuelVolume
+                val denominator = (eE85 - eGas) / 100.0
+                if (denominator != 0.0) {
+                    val numerator = (eTarget / 100.0 * capacity) - (eCurrent / 100.0 * currentFuelVolume) - (eGas / 100.0 * totalFillVolume)
+                    val gallonsE85Needed = numerator / denominator
+                    when {
+                        gallonsE85Needed > totalFillVolume ->
+                            "Not enough tank space to reach ${eTarget.toInt()}% - only ${"%.1f".format(totalFillVolume)} gal available but ${"%.1f".format(gallonsE85Needed)} gal of E85 needed. Try a lower fuel level."
+                        gallonsE85Needed < 0 ->
+                            "Target ${eTarget.toInt()}% is lower than what's achievable - add pump gas only or drain some fuel first."
+                        else -> null
+                    }
+                } else null
+            }
             else -> null
         }
     }
 
-    val frostedColors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f))
-    val frostedBorder = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+    val filledFieldColors = TextFieldDefaults.colors(
+        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        focusedLabelColor = MaterialTheme.colorScheme.primary,
+        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+        unfocusedIndicatorColor = Color.Transparent,
+        disabledIndicatorColor = Color.Transparent,
+    )
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) }
-            .verticalScroll(rememberScrollState()),
+            .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) },
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "E85 Blend Calculator",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.White,
-            fontWeight = FontWeight.ExtraBold,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-            textAlign = TextAlign.Center
-        )
+        // ── Header ────────────────────────────────────────────────────────────
+        Column(modifier = Modifier.padding(top = 24.dp, bottom = 4.dp)) {
+            Text(
+                text = "E85 Blend",
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                text = "Calculator",
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
 
-        Card(shape = RoundedCornerShape(24.dp), colors = frostedColors, border = frostedBorder) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                val fields = listOf("Tank Capacity" to tankCapacity, "Pump Gas %" to pumpGasPercentage, "Pump E85 %" to pumpE85Percentage, "Target Ethanol %" to targetEthanolPercentage, "Current Ethanol %" to currentEthanolPercentage)
-                fields.forEachIndexed { index, (label, value) ->
-                    OutlinedTextField(
+        // ── Fuel Setup Card ───────────────────────────────────────────────────
+        ElevatedCard(
+            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "FUEL SETUP",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                val inputFields = listOf(
+                    Triple("Tank Capacity (gal)", tankCapacity, ImeAction.Next),
+                    Triple("Pump Gas %", pumpGasPercentage, ImeAction.Next),
+                    Triple("Pump E85 %", pumpE85Percentage, ImeAction.Next),
+                    Triple("Target Ethanol %", targetEthanolPercentage, ImeAction.Next),
+                    Triple("Current Ethanol %", currentEthanolPercentage, ImeAction.Done),
+                )
+                inputFields.forEachIndexed { index, (label, value, imeAction) ->
+                    TextField(
                         value = value,
-                        onValueChange = { newValue ->
-                            if (newValue.isEmpty() || newValue.toDoubleOrNull() != null) {
-                                when(index) {
-                                    0 -> tankCapacity = newValue
-                                    1 -> pumpGasPercentage = newValue
-                                    2 -> pumpE85Percentage = newValue
-                                    3 -> targetEthanolPercentage = newValue
-                                    4 -> currentEthanolPercentage = newValue
+                        onValueChange = { newVal ->
+                            if (newVal.isEmpty() || newVal.toDoubleOrNull() != null) {
+                                when (index) {
+                                    0 -> tankCapacity = newVal
+                                    1 -> pumpGasPercentage = newVal
+                                    2 -> pumpE85Percentage = newVal
+                                    3 -> targetEthanolPercentage = newVal
+                                    4 -> currentEthanolPercentage = newVal
                                 }
                             }
                         },
-                        label = { Text(label, color = Color.White.copy(alpha = 0.6f)) },
-                        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White),
+                        label = { Text(label) },
+                        colors = filledFieldColors,
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = if (index == 4) ImeAction.Done else ImeAction.Next
-                        )
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction)
                     )
                 }
             }
         }
 
-        Card(shape = RoundedCornerShape(24.dp), colors = frostedColors, border = frostedBorder) {
-            Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        // ── Fuel Level Card ───────────────────────────────────────────────────
+        ElevatedCard(
+            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text(
+                    text = "CURRENT FUEL LEVEL",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 Slider(
                     value = currentFuelLevelPercentage,
                     onValueChange = {
                         currentFuelLevelPercentage = it
-                        // This forces the keyboard to dismiss when the slider is touched
                         focusManager.clearFocus()
                     },
                     valueRange = 0f..100f
                 )
-                Text("Fuel Level: ${currentFuelLevelPercentage.toInt()}%", color = Color.White, style = MaterialTheme.typography.bodyLarge)
+                val gallonsInTank = (tankCapacity.toDoubleOrNull() ?: 0.0) * (currentFuelLevelPercentage / 100.0)
+                Text(
+                    text = "${currentFuelLevelPercentage.toInt()}% full  ·  ${"%.1f".format(gallonsInTank)} gal in tank",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
         }
 
+        // ── Result Card ───────────────────────────────────────────────────────
         Card(
-            shape = RoundedCornerShape(24.dp),
-            colors = frostedColors,
-            border = frostedBorder,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp)
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(modifier = Modifier.padding(24.dp)) {
                 Text(
-                    text = "Gallons E85: ${"%.2f".format(blendResult.gallonsE85Needed)}",
-                    color = Color.White,
+                    text = "BLEND RESULT",
+                    style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
+                    letterSpacing = 1.5.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                 )
-                Text(
-                    text = "Gallons Pump Gas: ${"%.2f".format(blendResult.gallonsPumpGasNeeded)}",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center
-                )
-                // Added the corrected line showing resulting ethanol percentage
-                val resultingEthanolPercentage = if (blendResult.totalFillVolume > 0) {
-                    val currentFuelVolume = (tankCapacity.toDoubleOrNull() ?: 0.0) * (currentFuelLevelPercentage.toDouble() / 100.0)
-                    val eCurrent = currentEthanolPercentage.toDoubleOrNull() ?: 0.0
-                    val eE85 = pumpE85Percentage.toDoubleOrNull() ?: 0.0
-                    val eGas = pumpGasPercentage.toDoubleOrNull() ?: 0.0
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    val ethanolInCurrentFuel = currentFuelVolume * (eCurrent / 100.0)
-                    val ethanolFromE85 = blendResult.gallonsE85Needed * (eE85 / 100.0)
-                    val ethanolFromGas = blendResult.gallonsPumpGasNeeded * (eGas / 100.0)
+                Crossfade(
+                    targetState = validationError != null,
+                    animationSpec = tween(300),
+                    label = "blend_result"
+                ) { hasError ->
+                    Column(modifier = Modifier.animateContentSize(tween(300))) {
+                        if (hasError) {
+                            Text(
+                                text = validationError ?: "",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        } else {
+                            Text(
+                                text = "${"%.2f".format(blendResult.gallonsE85Needed)} gal E85",
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                text = "+ ${"%.2f".format(blendResult.gallonsPumpGasNeeded)} gal pump gas",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            HorizontalDivider(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f))
+                            Spacer(modifier = Modifier.height(12.dp))
 
-                    val totalEthanol = ethanolInCurrentFuel + ethanolFromE85 + ethanolFromGas
-                    val totalVolume = currentFuelVolume + blendResult.totalFillVolume
+                            val resultingEthanolPercentage = run {
+                                val currentFuelVolume = (tankCapacity.toDoubleOrNull() ?: 0.0) * (currentFuelLevelPercentage.toDouble() / 100.0)
+                                val eCurrent = currentEthanolPercentage.toDoubleOrNull() ?: 0.0
+                                val eE85 = pumpE85Percentage.toDoubleOrNull() ?: 0.0
+                                val eGas = pumpGasPercentage.toDoubleOrNull() ?: 0.0
+                                val totalEthanol = currentFuelVolume * (eCurrent / 100.0) +
+                                    blendResult.gallonsE85Needed * (eE85 / 100.0) +
+                                    blendResult.gallonsPumpGasNeeded * (eGas / 100.0)
+                                val totalVolume = currentFuelVolume + blendResult.totalFillVolume
+                                if (totalVolume > 0) (totalEthanol / totalVolume) * 100.0 else 0.0
+                            }
 
-                    if (totalVolume > 0) {
-                        (totalEthanol / totalVolume) * 100.0
-                    } else {
-                        0.0
+                            Text(
+                                text = "Resulting mixture: ${"%.2f".format(resultingEthanolPercentage)}% ethanol",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
                     }
-                } else {
-                    0.0
-                }
-
-                Text(
-                    text = "Resulting fuel mixture: ${"%.2f".format(resultingEthanolPercentage)}% ethanol",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
-                )
-                if (validationError != null) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = validationError,
-                        color = Color(0xFFFFB74D),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
                 }
             }
         }

@@ -2,29 +2,34 @@ package com.example.e85calculator.ui.theme
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
-// Define modern "Expressive" dark colors
-private val DarkColorScheme = darkColorScheme(
-    primary = Color.White, // Your custom blue
-    onPrimary = Color.Gray,
-    surfaceContainer = Color(0xFF1E1E22), // Modern dark background
-    surfaceContainerHighest = Color(0xFF333338),
-    onSurface = Color.White
+private val LightColorScheme = lightColorScheme(
+    primary = GreenPrimary,
+    onPrimary = GreenOnPrimary,
+    primaryContainer = GreenPrimaryContainer,
+    onPrimaryContainer = GreenOnPrimaryContainer,
+    secondary = GreenSecondary,
+    onSecondary = GreenOnSecondary,
+    secondaryContainer = GreenSecondaryContainer,
+    onSecondaryContainer = GreenOnSecondaryContainer,
+    background = CleanBackground,
+    onBackground = CleanOnBackground,
+    surface = CleanSurface,
+    onSurface = CleanOnSurface,
+    surfaceVariant = CleanSurfaceVariant,
+    onSurfaceVariant = CleanOnSurfaceVariant,
+    surfaceContainer = CleanSurfaceContainer,
+    surfaceContainerHigh = CleanSurfaceContainerHigh,
+    surfaceContainerHighest = CleanSurfaceContainerHighest,
+    outline = CleanOutline,
+    outlineVariant = CleanOutlineVariant,
 )
 
 @Composable
-fun E85CalculatorTheme(
-    // Force true for your carbon fiber theme
-    content: @Composable () -> Unit
-) {
-    // You can keep dynamic color, but for a carbon fiber dashboard,
-    // a consistent dark theme often looks more "pro."
-    val colorScheme = DarkColorScheme
-
+fun E85CalculatorTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AppTypography, // Ensure this exists in your project
+        colorScheme = LightColorScheme,
+        typography = AppTypography,
         content = content
     )
 }
