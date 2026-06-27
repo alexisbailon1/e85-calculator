@@ -152,13 +152,13 @@ fun CalculatorScreen(modifier: Modifier) {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp
     // scale factor: 1.0 at 800dp, clamped between 0.75 and 1.15
-    val scale = (screenHeight / 800f).coerceIn(0.75f, 1.15f)
+    val scale = (screenHeight / 800f).coerceIn(0.75f, 1.0f)
 
     val logoHeight = (56 * scale).dp
     val headerTopPadding = (16 * scale).dp
     val logoTitleSpacing = (6 * scale).dp
-    val cardPadding = (16 * scale).dp
-    val fieldSpacing = (10 * scale).dp
+    val cardPadding = (12 * scale).dp
+    val fieldSpacing = (6 * scale).dp
     val sectionSpacing = (12 * scale).dp
 
     val e85Blue = Color(0xFF0057B8)
