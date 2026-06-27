@@ -9,6 +9,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -272,12 +274,16 @@ fun CalculatorScreen(modifier: Modifier) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize(spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
+                ) {
                 Crossfade(
                     targetState = validationError != null,
-                    animationSpec = tween(300),
+                    animationSpec = tween(200),
                     label = "blend_result"
                 ) { hasError ->
-                    Column(modifier = Modifier.animateContentSize(tween(300))) {
+                    Column {
                         if (hasError) {
                             Text(
                                 text = validationError ?: "",
@@ -323,6 +329,7 @@ fun CalculatorScreen(modifier: Modifier) {
                         }
                     }
                 }
+                } // end Box
             }
         }
     }
