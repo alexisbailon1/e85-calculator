@@ -124,6 +124,24 @@ fun CalculatorScreen(modifier: Modifier) {
         )
     }
 
+    val validationError: String? = remember(tankCapacity, currentEthanolPercentage, targetEthanolPercentage, pumpE85Percentage, pumpGasPercentage, currentFuelLevelPercentage) {
+        val capacity = tankCapacity.toDoubleOrNull()
+        val eCurrent = currentEthanolPercentage.toDoubleOrNull()
+        val eTarget = targetEthanolPercentage.toDoubleOrNull()
+        val eE85 = pumpE85Percentage.toDoubleOrNull()
+        val eGas = pumpGasPercentage.toDoubleOrNull()
+        when {
+            capacity != null && capacity <= 0 -> "Tank capacity must be greater than 0"
+            currentFuelLevelPercentage >= 100f -> "Tank is full — nothing to add"
+            eE85 != null && eGas != null && eE85 <= eGas -> "Pump E85 % must be higher than pump gas %"
+            eTarget != null && eE85 != null && eTarget > eE85 -> "Target % (${eTarget.toInt()}%) exceeds pump E85 % (${eE85.toInt()}%) — not achievable"
+            eTarget != null && eGas != null && eTarget < eGas -> "Target % (${eTarget.toInt()}%) is below pump gas % (${eGas.toInt()}%) — need to drain tank first"
+            eCurrent != null && eTarget != null && eE85 != null && eGas != null &&
+                eCurrent > eTarget && eCurrent > eGas -> "Current ethanol (${eCurrent.toInt()}%) already exceeds target — need to add pump gas only or drain tank"
+            else -> null
+        }
+    }
+
     val frostedColors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f))
     val frostedBorder = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
 
@@ -242,6 +260,15 @@ fun CalculatorScreen(modifier: Modifier) {
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center
                 )
+                if (validationError != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = validationError,
+                        color = Color(0xFFFFB74D),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }
