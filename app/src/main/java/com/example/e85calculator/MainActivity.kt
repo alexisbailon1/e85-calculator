@@ -215,8 +215,7 @@ fun CalculatorScreen(modifier: Modifier) {
                 )
                 // Added the corrected line showing resulting ethanol percentage
                 val resultingEthanolPercentage = if (blendResult.totalFillVolume > 0) {
-                    val currentFuelVolume = tankCapacity.toDoubleOrNull()
-                        ?: (0.0 * (currentFuelLevelPercentage.toDouble() / 100.0))
+                    val currentFuelVolume = (tankCapacity.toDoubleOrNull() ?: 0.0) * (currentFuelLevelPercentage.toDouble() / 100.0)
                     val eCurrent = currentEthanolPercentage.toDoubleOrNull() ?: 0.0
                     val eE85 = pumpE85Percentage.toDoubleOrNull() ?: 0.0
                     val eGas = pumpGasPercentage.toDoubleOrNull() ?: 0.0
