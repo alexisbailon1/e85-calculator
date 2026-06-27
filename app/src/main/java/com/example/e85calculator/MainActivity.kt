@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
@@ -149,6 +150,17 @@ fun CalculatorScreen(modifier: Modifier) {
         }
     }
 
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    // scale factor: 1.0 at 800dp, clamped between 0.75 and 1.15
+    val scale = (screenHeight / 800f).coerceIn(0.75f, 1.15f)
+
+    val logoHeight = (56 * scale).dp
+    val headerTopPadding = (16 * scale).dp
+    val logoTitleSpacing = (6 * scale).dp
+    val cardPadding = (16 * scale).dp
+    val fieldSpacing = (10 * scale).dp
+    val sectionSpacing = (12 * scale).dp
+
     val e85Blue = Color(0xFF0057B8)
 
     val filledFieldColors = TextFieldDefaults.colors(
@@ -169,16 +181,16 @@ fun CalculatorScreen(modifier: Modifier) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) },
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(sectionSpacing)
     ) {
         // ── Header ────────────────────────────────────────────────────────────
-        Column(modifier = Modifier.padding(top = 24.dp, bottom = 4.dp)) {
+        Column(modifier = Modifier.padding(top = headerTopPadding, bottom = 4.dp)) {
             Image(
                 painter = painterResource(id = R.drawable.e85logo),
                 contentDescription = "E85 Logo",
-                modifier = Modifier.height(72.dp)
+                modifier = Modifier.height(logoHeight)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(logoTitleSpacing))
             Text(
                 text = buildAnnotatedString {
                     withStyle(SpanStyle(color = MaterialTheme.colorScheme.onBackground)) { append("Blend ") }
@@ -195,8 +207,8 @@ fun CalculatorScreen(modifier: Modifier) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier.padding(cardPadding),
+                verticalArrangement = Arrangement.spacedBy(fieldSpacing)
             ) {
                 Text(
                     text = "FUEL SETUP",
@@ -242,7 +254,7 @@ fun CalculatorScreen(modifier: Modifier) {
             shape = RoundedCornerShape(28.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.padding(cardPadding)) {
                 Text(
                     text = "CURRENT FUEL LEVEL",
                     style = MaterialTheme.typography.labelMedium,
@@ -279,7 +291,7 @@ fun CalculatorScreen(modifier: Modifier) {
                 .wrapContentHeight()
                 .padding(bottom = 32.dp)
         ) {
-            Column(modifier = Modifier.padding(24.dp)) {
+            Column(modifier = Modifier.padding(cardPadding)) {
                 Text(
                     text = "BLEND RESULT",
                     style = MaterialTheme.typography.labelMedium,
