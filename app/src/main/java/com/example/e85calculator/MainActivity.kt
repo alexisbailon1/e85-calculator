@@ -23,10 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.foundation.Image
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.painterResource
-import com.example.e85calculator.R
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -154,9 +150,6 @@ fun CalculatorScreen(modifier: Modifier) {
     // scale factor: 1.0 at 800dp, clamped between 0.75 and 1.15
     val scale = (screenHeight / 800f).coerceIn(0.75f, 1.0f)
 
-    val logoHeight = (56 * scale).dp
-    val headerTopPadding = (16 * scale).dp
-    val logoTitleSpacing = (6 * scale).dp
     val cardPadding = (12 * scale).dp
     val fieldSpacing = (6 * scale).dp
     val sectionSpacing = (12 * scale).dp
@@ -184,19 +177,21 @@ fun CalculatorScreen(modifier: Modifier) {
         verticalArrangement = Arrangement.spacedBy(sectionSpacing)
     ) {
         // ── Header ────────────────────────────────────────────────────────────
-        Column(modifier = Modifier.padding(top = headerTopPadding, bottom = 4.dp)) {
-            Image(
-                painter = painterResource(id = R.drawable.e85logo),
-                contentDescription = "E85 Logo",
-                modifier = Modifier.height(logoHeight)
+        Column(modifier = Modifier.padding(top = 24.dp, bottom = 4.dp)) {
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(SpanStyle(color = e85Blue)) { append("E85") }
+                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.onBackground)) { append(" 🌽") }
+                },
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(logoTitleSpacing))
             Text(
                 text = buildAnnotatedString {
                     withStyle(SpanStyle(color = MaterialTheme.colorScheme.onBackground)) { append("Blend ") }
                     withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) { append("Calculator") }
                 },
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold
             )
         }
