@@ -1,15 +1,40 @@
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Files for the VM to execute
+*.class
+
+# Android Studio / IntelliJ IDE
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+.idea/
+/.idea/
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+
+# Gradle & Kotlin Cache
+.gradle/
+/.gradle/
+.kotlin/
+/.kotlin/
+**/build/
+/build/
+
+# Local configuration & Secrets
 local.properties
+/local.properties
+
+# Native build
+.externalNativeBuild
+.cxx/
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# AI & Local Scratchpad files
+.claude/
+claude_test.txt
