@@ -1,4 +1,4 @@
-package com.example.e85calculator
+package com.alexisbailon.e85calculator
 
 data class BlendResult(
     val gallonsE85Needed: Double,

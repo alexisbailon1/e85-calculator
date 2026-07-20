@@ -1,4 +1,4 @@
-package com.example.e85calculator
+package com.alexisbailon.e85calculator
 
 import android.content.Context
 import android.os.Bundle
@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
-import com.example.e85calculator.ui.theme.E85CalculatorTheme
+import com.alexisbailon.e85calculator.ui.theme.E85CalculatorTheme
 
 class MainActivity : ComponentActivity() {
     override fun onResume() {

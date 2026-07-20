@@ -1,4 +1,4 @@
-package com.example.e85calculator.ui.theme
+package com.alexisbailon.e85calculator.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
