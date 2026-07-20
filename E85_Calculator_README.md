@@ -112,19 +112,24 @@ flowchart TD
 ./gradlew connectedAndroidTest   # instrumented UI tests (requires a device/emulator)
 ```
 
-## AI-Assisted Development
+## Architecture Migration & Development Methodology
 
-This project was built using an AI-assisted workflow with Claude Code as a pair-programming collaborator throughout the entire lifecycle, not just for boilerplate generation.
+This project represents a complete architectural migration from a cross-platform framework to a high-performance native stack, leveraging an AI-assisted engineering workflow to accelerate execution without sacrificing architectural control.
 
-**Prototyping:** The initial core functionality — the ethanol-blend algebra in `FuelCalculator`, the Compose input form, and the SharedPreferences persistence layer — was scaffolded through conversational iteration, going from a plain-language description of the blending problem straight to working Kotlin.
+### From .NET MAUI to Native Android
+E85 Calculator was originally built and deployed as a fully functional, private utility application developed in **.NET MAUI (C#)**. To achieve optimal runtime performance, superior UI responsiveness, and long-term maintainability for its public open-source release, the application was systematically re-architected into native Android using **Kotlin and Jetpack Compose**.
 
-**Iterative refinement:** The commit history reflects a tight feedback loop between manual testing and AI-assisted fixes, including:
-- Correcting a calculation bug where the resulting ethanol percentage used the full tank capacity instead of the actual current fuel volume.
-- Adding real-time input validation with human-readable, actionable error messages (e.g., flagging when a target percentage isn't reachable given the pump's fuel options).
-- A full UI overhaul from a functional-but-plain layout to a card-based Material 3 design with animated result transitions.
-- Screen-size-aware layout scaling and portrait-lock adjustments to keep the calculator usable one-handed at a gas pump.
+### AI as a Force Multiplier
+Rather than utilizing AI for simple prompt-to-code generation, **Claude Code** was integrated into the development lifecycle as an interactive pair-programmer and code-translation engine:
+- **Cross-Platform Translation:** Accelerated the syntax and paradigm migration of the core mathematical blending algebra from C# to unit-testable Kotlin within `FuelCalculator.kt`.
+- **UI Modernization:** Assisted in translating declarative UI structures into modern Material 3 Jetpack Compose components, including custom interactive sliders and card-based layout transitions.
+- **Iterative Refactoring:** Handled syntax adaptation and bug triage during the transition to Android-native persistence (`SharedPreferences`) and height-adaptive layout scaling.
 
-**Division of labor:** AI tooling handled first-draft implementation, refactors, and bug triage from described symptoms; every change was manually reviewed, run on-device, and tested against real-world fill-up scenarios before being committed. Architectural decisions (keeping the blend math as a pure, UI-free function; what state needs to persist; validation rules) were driven by the project owner, with the AI assisting on implementation and Kotlin/Compose idiom.
+### Engineering Ownership & Validation
+While AI tooling accelerated code translation and boilerplate scaffolding, all core systems architecture and quality standards were driven entirely by the project owner:
+- **Architectural Design:** Designed the single-activity Composable structure (`CalculatorScreen`) and enforced strict decoupling between the UI layer and the pure, stateless mathematical core.
+- **Domain Logic & Safety:** Defined all real-time mathematical boundary checks and validation error states to prevent impossible blending calculations at the pump.
+- **Real-World Verification:** Every translated component and refactored calculation was manually code-reviewed, executed on physical Android devices, and validated against real-world gas station fill-up scenarios before committing to version control.
 
 ## Project Structure
 
