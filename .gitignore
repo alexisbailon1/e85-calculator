@@ -38,3 +38,5 @@ Thumbs.db
 # AI & Local Scratchpad files
 .claude/
 claude_test.txt
+AGENTS.md
+CLAUDE.md
