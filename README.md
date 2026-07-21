@@ -1,155 +1,193 @@
 # E85 Calculator 🌽
 
-A native Android app that tells drivers of flex-fuel vehicles exactly how many gallons of E85 and pump gas to add to hit a target ethanol blend, given whatever fuel is already in the tank.
+A native Android application that calculates how many gallons of E85 and pump gasoline to add to reach a target ethanol blend based on the fuel already in the tank.
 
 <p align="center">
-  <img src="assets/home_screen.png" width="280" alt="E85 Calculator Home Screen" />
+  <img src="assets/home_screen.png" width="280" alt="E85 Calculator home screen" />
+  &nbsp;&nbsp;
+  <img src="assets/blend_result.png" width="280" alt="E85 Calculator blend result" />
 </p>
 
 ## Overview
 
-Flex-fuel vehicles can run on any blend of gasoline and E85 (a high-ethanol fuel), and many owners "splash blend" at the pump - mixing E85 and regular gas in the tank to hit a specific ethanol percentage (commonly for performance tuning). Doing this math by hand at the pump is error-prone: it requires accounting for the ethanol percentage of the fuel already in the tank, the actual volume remaining, and the ethanol content of both fuels being added.
+Drivers of flex-fuel and performance-tuned vehicles may mix E85 with regular gasoline to reach a specific ethanol percentage. Calculating that mixture manually requires accounting for:
 
-E85 Calculator solves this with a single-screen tool that:
+- Tank capacity
+- Current fuel volume
+- Current ethanol percentage
+- Actual ethanol content of the available E85
+- Ethanol content of the available pump gasoline
+- Desired final ethanol percentage
 
-- Takes the tank's total capacity, current fuel level, and the ethanol percentage already in the tank.
-- Takes the ethanol percentage of the pump's E85 and regular gas.
-- Solves for the exact gallons of each fuel needed to hit a target ethanol percentage after filling up.
-- Validates inputs in real time and surfaces clear, specific error messages when a target isn't mathematically achievable (e.g., not enough tank space, target below the pump gas percentage, etc.).
-- Persists all inputs locally so the next fill-up starts where the last one left off.
-
-<p align="center">
-  <img src="assets/blend_result.png" width="280" alt="E85 Calculator Blend Result" />
-</p>
+E85 Calculator performs this calculation in real time and reports the amount of each fuel to add. It also detects targets that cannot be reached with the available tank space and fuel percentages.
 
 ## Features
 
-- **Blend math solved for you** - enter tank capacity, current ethanol %, target ethanol %, and the pump's E85/gas percentages; the app returns gallons of each to add.
-- **Live fuel level slider** - drag to set how full the tank currently is; gallons-in-tank updates instantly.
-- **Real-time validation** - catches impossible or contradictory inputs (target above/below achievable range, insufficient tank space, pump percentages reversed) before you act on bad numbers.
-- **Resulting mixture preview** - shows the final ethanol percentage the tank will land on after the blend.
-- **Persistent state** - all fields are saved to `SharedPreferences`, so values survive app restarts.
-- **Screen-on-while-active** - keeps the display awake while the app is in the foreground, since it's designed to be used standing at a gas pump.
-- **Portrait-locked, height-adaptive layout** - UI density scales to fit smaller screens without scrolling.
+- **Ethanol blend calculation** — calculates the gallons of E85 and pump gasoline needed to reach the selected target.
+- **Live fuel-level control** — updates the estimated fuel currently in the tank as the slider moves.
+- **Real-time validation** — identifies missing, contradictory, or mathematically impossible inputs before displaying a result.
+- **Result preview** — displays the expected final ethanol percentage after filling.
+- **Persistent inputs** — saves calculator values locally with `SharedPreferences`.
+- **Screen-awake behavior** — keeps the display active while the application is in the foreground.
+- **Adaptive layout** — adjusts interface density for devices with different screen heights.
+- **Offline operation** — performs all calculations locally without an account or network connection.
+
+## Screenshots
+
+<p align="center">
+  <img src="assets/home_screen.png" width="280" alt="Input fields and fuel-level slider" />
+  &nbsp;&nbsp;
+  <img src="assets/blend_result.png" width="280" alt="Calculated E85 and gasoline quantities" />
+</p>
+
+## Calculation Model
+
+The calculator treats ethanol content as a volume balance.
+
+Let:
+
+- `T` = total tank capacity
+- `V` = current fuel volume
+- `F = T - V` = available fill volume
+- `c` = current ethanol fraction
+- `e` = E85 ethanol fraction
+- `g` = pump-gas ethanol fraction
+- `t` = target ethanol fraction
+- `x` = E85 volume to add
+- `y` = pump-gas volume to add
+
+The two required relationships are:
+
+```text
+x + y = F
+cV + ex + gy = tT
+```
+
+Solving for the amount of E85 gives:
+
+```text
+x = (tT - cV - gF) / (e - g)
+y = F - x
+```
+
+A blend is considered achievable only when the calculated values are finite and both `x` and `y` fall within the available fill volume.
+
+The calculation is implemented in [`FuelCalculator.kt`](app/src/main/java/com/alexisbailon/e85calculator/FuelCalculator.kt) as stateless domain logic separate from the Compose interface.
+
+## Architecture
+
+The application uses a small, single-activity architecture suited to its focused scope:
+
+- `MainActivity` hosts the Compose interface.
+- `CalculatorScreen` owns the current UI state and input-validation flow.
+- `FuelCalculator` performs the blend calculation without Android UI dependencies.
+- `SharedPreferences` stores user inputs between launches.
+
+This is intentionally a stateful Compose implementation rather than an MVVM architecture. The calculation logic remains isolated so it can be tested and changed independently from the interface.
+
+```mermaid
+flowchart TD
+    A["Input fields"] --> C["Validation"]
+    B["Fuel-level slider"] --> C
+    A --> P[("SharedPreferences")]
+    B --> P
+    P -. "Restore saved inputs" .-> A
+    P -. "Restore saved fuel level" .-> B
+    C -->|"Valid input"| F["FuelCalculator.calculateBlend()"]
+    C -->|"Invalid input"| E["Validation message"]
+    F --> R["BlendResult"]
+    R --> D["Result card"]
+```
+
+## Tech Stack
+
+| Area | Technology |
+|---|---|
+| Language | [Kotlin](https://kotlinlang.org/) |
+| User interface | [Jetpack Compose](https://developer.android.com/jetpack/compose) and Material 3 |
+| Application structure | Single Activity with a stateful Compose screen |
+| Domain logic | Stateless Kotlin calculation object |
+| Persistence | Android `SharedPreferences` |
+| Build system | Gradle Kotlin DSL with a version catalog |
+| Minimum Android API | 24 |
 
 ## Getting Started
 
-You can either install the pre-compiled application directly on your Android device or build the project from source using Android Studio.
+### Install the APK
 
-### Option 1: Quick Install (APK)
+1. Open the [latest GitHub release](https://github.com/alexisbailon1/e85-calculator/releases/latest).
+2. Download the attached `.apk` file.
+3. Open the file on an Android device and follow the installation prompt.
 
-The fastest way to test the calculator on an Android device:
+Android may ask for permission to install an application obtained outside the Play Store. Only install release files downloaded from this repository.
 
-1. Download the latest **`.apk`** file from the [Releases Page](https://github.com/alexisbailon1/e85-calculator/releases/latest).
-2. Open the downloaded file on your Android device.
-3. If prompted, allow your phone or browser to install apps from "Unknown Sources" (required for side-loading apps outside the Google Play Store).
-
----
-
-### Option 2: Build from Source
+### Build from Source
 
 #### Prerequisites
 
-- [Android Studio](https://developer.android.com/studio) (Ladybug or newer recommended)
-- JDK 11+
-- An Android device or emulator running API 24 (Android 7.0) or later
+- [Android Studio](https://developer.android.com/studio)
+- The JDK bundled with the supported Android Studio version
+- An Android device or emulator running API 24 or later
 
 #### Setup
 
-1. Clone the repository and navigate into the project directory:
+1. Clone the repository:
+
    ```bash
    git clone https://github.com/alexisbailon1/e85-calculator.git
    cd e85-calculator
    ```
 
-2. Open the project in Android Studio and let it sync Gradle, or compile via command line:
+2. Open the project in Android Studio and allow Gradle to synchronize.
+
+3. Build a debug APK:
+
    ```bash
    ./gradlew assembleDebug
    ```
 
-3. Run on a connected device or emulator:
+4. Install the debug build on a connected device or running emulator:
+
    ```bash
    ./gradlew installDebug
    ```
-   or simply use the **Run** button in Android Studio.
 
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Language | [Kotlin](https://kotlinlang.org/) |
-| UI Toolkit | [Jetpack Compose](https://developer.android.com/jetpack/compose) + Material 3 |
-| Architecture | Single-Activity, stateful Composable (`CalculatorScreen`) with a pure-function calculation core (`FuelCalculator`) |
-| Persistence | Android `SharedPreferences` |
-| Build System | Gradle (Kotlin DSL) with version catalogs (`libs.versions.toml`) |
-| Min SDK / Target SDK | 24 / 37 |
-
-The core blend math lives in [`FuelCalculator.kt`](app/src/main/java/com/example/e85calculator/FuelCalculator.kt) as a stateless, pure calculation object, kept fully decoupled from the Compose UI in [`MainActivity.kt`](app/src/main/java/com/alexisbailon/e85calculator/MainActivity.kt).
-
-```mermaid
-flowchart TD
-    %% UI / Compose Layer
-    A["Input Fields
-    Tank capacity, pump E85 %, pump gas %,
-    target ethanol %, current ethanol %"]
-    B["Fuel Level Slider
-    currentFuelLevelPercentage"]
-    C["Validation
-    validationError checks"]
-    D["Result Display
-    Blend Result card"]
-
-    %% Persistence Layer
-    P[("SharedPreferences
-    calculator_prefs")]
-
-    %% Core Math Layer
-    F["FuelCalculator (pure math engine)
-    calculateBlend(...)"]
-    R["BlendResult
-    gallonsE85Needed, gallonsPumpGasNeeded,
-    totalFillVolume"]
-
-    %% Data Flow & Connections
-    A --> P
-    B --> P
-    P -. restores on launch .-> A
-    P -. restores on launch .-> B
-
-    A --> F
-    B --> F
-    F --> R
-    R --> D
-    
-    A --> C
-    B --> C
-    C -->|blocks result if invalid| D
-```
-
-## Architecture Migration & Development Methodology
-
-This project represents a complete architectural migration from a cross-platform framework to a high-performance native stack, leveraging an AI-assisted engineering workflow to accelerate execution without sacrificing architectural control.
-
-### From .NET MAUI to Native Android
-E85 Calculator was originally built and deployed as a fully functional, private utility application developed in **.NET MAUI (C#)**. To achieve optimal runtime performance, superior UI responsiveness, and long-term maintainability for its public open-source release, the application was systematically re-architected into native Android using **Kotlin and Jetpack Compose**.
-
-### AI as a Force Multiplier
-Rather than utilizing AI for simple prompt-to-code generation, **Claude Code** was integrated into the development lifecycle as an interactive pair-programmer and code-translation engine:
-- **Cross-Platform Translation:** Accelerated the syntax and paradigm migration of the core mathematical blending algebra from C# to standalone Kotlin within `FuelCalculator.kt`.
-- **UI Modernization:** Assisted in translating declarative UI structures into modern Material 3 Jetpack Compose components, including custom interactive sliders and card-based layout transitions.
-- **Iterative Refactoring:** Handled syntax adaptation and bug triage during the transition to Android-native persistence (`SharedPreferences`) and height-adaptive layout scaling.
-
-### Engineering Ownership & Validation
-While AI tooling accelerated code translation and boilerplate scaffolding, all core systems architecture and quality standards were driven entirely by the project owner:
-- **Architectural Design:** Designed the single-activity Composable structure (`CalculatorScreen`) and enforced strict decoupling between the UI layer and the pure, stateless mathematical core.
-- **Domain Logic & Safety:** Defined all real-time mathematical boundary checks and validation error states to prevent impossible blending calculations at the pump.
-- **Real-World Verification:** Every translated component and refactored calculation was manually code-reviewed, executed on physical Android devices, and validated against real-world gas station fill-up scenarios before committing to version control.
+The application can also be launched with the **Run** button in Android Studio.
 
 ## Project Structure
 
+```text
+app/src/main/java/com/alexisbailon/e85calculator/
+├── MainActivity.kt        # Compose UI, state, validation, and persistence
+├── FuelCalculator.kt      # Stateless blend-calculation logic
+└── ui/theme/              # Material 3 colors, typography, and theme
 ```
-app/src/main/java/com/example/e85calculator/
-├── MainActivity.kt        # Single Activity, Compose UI, state, persistence
-├── FuelCalculator.kt      # Pure blend-calculation logic (unit-testable)
-└── ui/theme/              # Material 3 theme, color scheme, typography
-```
+
+## Migration History
+
+The public Android version was reimplemented from an earlier private application built with .NET MAUI and C#. The migration moved the interface to Jetpack Compose and the calculation logic to standalone Kotlin.
+
+AI-assisted development tools were used during portions of translation, debugging, and refactoring. The resulting code, calculation behavior, validation rules, and device behavior were reviewed and tested manually before release.
+
+## Validation
+
+The application checks for conditions including:
+
+- Missing or nonnumeric values
+- Percentages outside the supported range
+- Pump-gas ethanol content greater than or equal to the E85 ethanol content
+- A target below or above the achievable range
+- Insufficient remaining tank capacity
+- Calculated fuel amounts outside the fillable volume
+
+> **Important:** Fuel ethanol content can vary by location, season, and supplier. The result is only as accurate as the values entered. Verify pump labels or measured ethanol content before relying on the calculation.
+
+## Contributing
+
+Issues and pull requests are welcome. For a proposed change:
+
+1. Create a branch from `main`.
+2. Keep calculation logic separate from Compose UI code when practical.
+3. Describe the behavior being changed.
+4. Include tests for changes to blend calculations or validation rules when possible.
+5. Open a pull request with screenshots for visible interface changes.
