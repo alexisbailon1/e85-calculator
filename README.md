@@ -2,7 +2,9 @@
 
 A native Android app that tells drivers of flex-fuel vehicles exactly how many gallons of E85 and pump gas to add to hit a target ethanol blend, given whatever fuel is already in the tank.
 
-<!-- SCREENSHOT: [App icon / home screen launcher tile on an Android device] -->
+<p align="center">
+  <img src="assets/home_screen.png" width="280" alt="E85 Calculator Home Screen" />
+</p>
 
 ## Overview
 
@@ -16,7 +18,9 @@ E85 Calculator solves this with a single-screen tool that:
 - Validates inputs in real time and surfaces clear, specific error messages when a target isn't mathematically achievable (e.g., not enough tank space, target below the pump gas percentage, etc.).
 - Persists all inputs locally so the next fill-up starts where the last one left off.
 
-<!-- SCREENSHOT: [Full app screen showing the Fuel Setup card, fuel level slider, and Blend Result card with a calculated gallon split] -->
+<p align="center">
+  <img src="assets/blend_result.png" width="280" alt="E85 Calculator Blend Result" />
+</p>
 
 ## Features
 
