@@ -8,7 +8,7 @@ A native Android app that tells drivers of flex-fuel vehicles exactly how many g
 
 ## Overview
 
-Flex-fuel vehicles can run on any blend of gasoline and E85 (a high-ethanol fuel), and many owners "splash blend" at the pump — mixing E85 and regular gas in the tank to hit a specific ethanol percentage (commonly for performance tuning). Doing this math by hand at the pump is error-prone: it requires accounting for the ethanol percentage of the fuel already in the tank, the actual volume remaining, and the ethanol content of both fuels being added.
+Flex-fuel vehicles can run on any blend of gasoline and E85 (a high-ethanol fuel), and many owners "splash blend" at the pump - mixing E85 and regular gas in the tank to hit a specific ethanol percentage (commonly for performance tuning). Doing this math by hand at the pump is error-prone: it requires accounting for the ethanol percentage of the fuel already in the tank, the actual volume remaining, and the ethanol content of both fuels being added.
 
 E85 Calculator solves this with a single-screen tool that:
 
@@ -24,13 +24,13 @@ E85 Calculator solves this with a single-screen tool that:
 
 ## Features
 
-- **Blend math solved for you** — enter tank capacity, current ethanol %, target ethanol %, and the pump's E85/gas percentages; the app returns gallons of each to add.
-- **Live fuel level slider** — drag to set how full the tank currently is; gallons-in-tank updates instantly.
-- **Real-time validation** — catches impossible or contradictory inputs (target above/below achievable range, insufficient tank space, pump percentages reversed) before you act on bad numbers.
-- **Resulting mixture preview** — shows the final ethanol percentage the tank will land on after the blend.
-- **Persistent state** — all fields are saved to `SharedPreferences`, so values survive app restarts.
-- **Screen-on-while-active** — keeps the display awake while the app is in the foreground, since it's designed to be used standing at a gas pump.
-- **Portrait-locked, height-adaptive layout** — UI density scales to fit smaller screens without scrolling.
+- **Blend math solved for you** - enter tank capacity, current ethanol %, target ethanol %, and the pump's E85/gas percentages; the app returns gallons of each to add.
+- **Live fuel level slider** - drag to set how full the tank currently is; gallons-in-tank updates instantly.
+- **Real-time validation** - catches impossible or contradictory inputs (target above/below achievable range, insufficient tank space, pump percentages reversed) before you act on bad numbers.
+- **Resulting mixture preview** - shows the final ethanol percentage the tank will land on after the blend.
+- **Persistent state** - all fields are saved to `SharedPreferences`, so values survive app restarts.
+- **Screen-on-while-active** - keeps the display awake while the app is in the foreground, since it's designed to be used standing at a gas pump.
+- **Portrait-locked, height-adaptive layout** - UI density scales to fit smaller screens without scrolling.
 
 ## Tech Stack
 
