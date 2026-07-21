@@ -84,29 +84,46 @@ flowchart TD
 ```
 
 ## Local Installation
+## Getting Started
 
-### Prerequisites
+You can either install the pre-compiled application directly on your Android device or build the project from source using Android Studio.
+
+### Option 1: Quick Install (APK)
+
+The fastest way to test the calculator on an Android device:
+
+1. Download the latest **`.apk`** file from the [Releases Page](https://github.com/alexisbailon1/e85-calculator/releases/latest).
+2. Open the downloaded file on your Android device.
+3. If prompted, allow your phone or browser to install apps from "Unknown Sources" (required for side-loading apps outside the Google Play Store).
+
+---
+
+### Option 2: Build from Source
+
+#### Prerequisites
 
 - [Android Studio](https://developer.android.com/studio) (Ladybug or newer recommended)
 - JDK 11+
 - An Android device or emulator running API 24 (Android 7.0) or later
 
-### Setup
+#### Setup
 
-1. Clone the repository:
+1. Clone the repository and navigate into the project directory:
    ```bash
-   git clone <repository-url>
-   cd E85Calculator
+   git clone https://github.com/alexisbailon1/e85-calculator.git
+   cd e85-calculator
    ```
-2. Open the project in Android Studio and let it sync Gradle, or build from the command line:
+
+2. Open the project in Android Studio and let it sync Gradle, or compile via command line:
    ```bash
    ./gradlew assembleDebug
    ```
+
 3. Run on a connected device or emulator:
    ```bash
    ./gradlew installDebug
    ```
-   or use the **Run** button in Android Studio.
+   or simply use the **Run** button in Android Studio.
 
 ## Architecture Migration & Development Methodology
 
