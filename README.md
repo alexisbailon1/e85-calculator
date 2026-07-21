@@ -17,14 +17,14 @@ E85 Calculator performs this calculation in real time and reports the amount of 
 
 ## Features
 
-- **Ethanol blend calculation** — calculates the gallons of E85 and pump gasoline needed to reach the selected target.
-- **Live fuel-level control** — updates the estimated fuel currently in the tank as the slider moves.
-- **Real-time validation** — identifies missing, contradictory, or mathematically impossible inputs before displaying a result.
-- **Result preview** — displays the expected final ethanol percentage after filling.
-- **Persistent inputs** — saves calculator values locally with `SharedPreferences`.
-- **Screen-awake behavior** — keeps the display active while the application is in the foreground.
-- **Adaptive layout** — adjusts interface density for devices with different screen heights.
-- **Offline operation** — performs all calculations locally without an account or network connection.
+- **Ethanol blend calculation** - calculates the gallons of E85 and pump gasoline needed to reach the selected target.
+- **Live fuel-level control** - updates the estimated fuel currently in the tank as the slider moves.
+- **Real-time validation** - identifies missing, contradictory, or mathematically impossible inputs before displaying a result.
+- **Result preview** - displays the expected final ethanol percentage after filling.
+- **Persistent inputs** - saves calculator values locally with `SharedPreferences`.
+- **Screen-awake behavior** - keeps the display active while the application is in the foreground.
+- **Adaptive layout** - adjusts interface density for devices with different screen heights.
+- **Offline operation** - performs all calculations locally without an account or network connection.
 
 ## Screenshots
 
