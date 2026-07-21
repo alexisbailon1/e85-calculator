@@ -2,12 +2,6 @@
 
 A native Android application that calculates how many gallons of E85 and pump gasoline to add to reach a target ethanol blend based on the fuel already in the tank.
 
-<p align="center">
-  <img src="assets/home_screen.png" width="280" alt="E85 Calculator home screen" />
-  &nbsp;&nbsp;
-  <img src="assets/blend_result.png" width="280" alt="E85 Calculator blend result" />
-</p>
-
 ## Overview
 
 Drivers of flex-fuel and performance-tuned vehicles may mix E85 with regular gasoline to reach a specific ethanol percentage. Calculating that mixture manually requires accounting for:
