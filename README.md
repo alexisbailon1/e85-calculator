@@ -88,26 +88,29 @@ The core blend math lives in [`FuelCalculator.kt`](app/src/main/java/com/example
 
 ```mermaid
 flowchart TD
-    subgraph UI["MainActivity / CalculatorScreen (Compose)"]
-        A["Input fields
-        Tank capacity, pump E85 %, pump gas %,
-        target ethanol %, current ethanol %"]
-        B["Fuel level slider
-        currentFuelLevelPercentage"]
-        C["Validation
-        validationError checks"]
-        D["Result display
-        Blend Result card"]
-    end
+    %% UI / Compose Layer
+    A["Input Fields
+    Tank capacity, pump E85 %, pump gas %,
+    target ethanol %, current ethanol %"]
+    B["Fuel Level Slider
+    currentFuelLevelPercentage"]
+    C["Validation
+    validationError checks"]
+    D["Result Display
+    Blend Result card"]
 
-    subgraph Persistence["SharedPreferences"]
-        P[("calculator_prefs")]
-    end
+    %% Persistence Layer
+    P[("SharedPreferences
+    calculator_prefs")]
 
-    subgraph Core["FuelCalculator (pure, unit-testable)"]
-        F["calculateBlend(...)"]
-    end
+    %% Core Math Layer
+    F["FuelCalculator (pure math engine)
+    calculateBlend(...)"]
+    R["BlendResult
+    gallonsE85Needed, gallonsPumpGasNeeded,
+    totalFillVolume"]
 
+    %% Data Flow & Connections
     A --> P
     B --> P
     P -. restores on launch .-> A
@@ -115,10 +118,9 @@ flowchart TD
 
     A --> F
     B --> F
-    F --> R["BlendResult
-    gallonsE85Needed, gallonsPumpGasNeeded,
-    totalFillVolume"]
+    F --> R
     R --> D
+    
     A --> C
     B --> C
     C -->|blocks result if invalid| D
