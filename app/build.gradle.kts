@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.e85calculator"
+    namespace = "com.alexisbailon.e85calculator"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.example.e85calculator"
+        applicationId = "com.alexisbailon.e85calculator"
         minSdk = 24
         targetSdk = 37
         versionCode = 1

@@ -37,10 +37,9 @@ E85 Calculator solves this with a single-screen tool that:
 | Architecture | Single-Activity, stateful Composable (`CalculatorScreen`) with a pure-function calculation core (`FuelCalculator`) |
 | Persistence | Android `SharedPreferences` |
 | Build System | Gradle (Kotlin DSL) with version catalogs (`libs.versions.toml`) |
-| Testing | JUnit4, AndroidX Test / Espresso, Compose UI Test |
 | Min SDK / Target SDK | 24 / 37 |
 
-The core blend math lives in [`FuelCalculator.kt`](app/src/main/java/com/example/e85calculator/FuelCalculator.kt) as a stateless, unit-testable object, kept fully decoupled from the Compose UI in [`MainActivity.kt`](app/src/main/java/com/example/e85calculator/MainActivity.kt).
+The core blend math lives in [`FuelCalculator.kt`](app/src/main/java/com/example/e85calculator/FuelCalculator.kt) as a stateless, pure calculation object, kept fully decoupled from the Compose UI in [`MainActivity.kt`](app/src/main/java/com/alexisbailon/e85calculator/MainActivity.kt).
 
 ```mermaid
 flowchart TD
@@ -105,13 +104,6 @@ flowchart TD
    ```
    or use the **Run** button in Android Studio.
 
-### Running Tests
-
-```bash
-./gradlew test              # unit tests
-./gradlew connectedAndroidTest   # instrumented UI tests (requires a device/emulator)
-```
-
 ## Architecture Migration & Development Methodology
 
 This project represents a complete architectural migration from a cross-platform framework to a high-performance native stack, leveraging an AI-assisted engineering workflow to accelerate execution without sacrificing architectural control.
@@ -121,7 +113,7 @@ E85 Calculator was originally built and deployed as a fully functional, private 
 
 ### AI as a Force Multiplier
 Rather than utilizing AI for simple prompt-to-code generation, **Claude Code** was integrated into the development lifecycle as an interactive pair-programmer and code-translation engine:
-- **Cross-Platform Translation:** Accelerated the syntax and paradigm migration of the core mathematical blending algebra from C# to unit-testable Kotlin within `FuelCalculator.kt`.
+- **Cross-Platform Translation:** Accelerated the syntax and paradigm migration of the core mathematical blending algebra from C# to standalone Kotlin within `FuelCalculator.kt`.
 - **UI Modernization:** Assisted in translating declarative UI structures into modern Material 3 Jetpack Compose components, including custom interactive sliders and card-based layout transitions.
 - **Iterative Refactoring:** Handled syntax adaptation and bug triage during the transition to Android-native persistence (`SharedPreferences`) and height-adaptive layout scaling.
 
